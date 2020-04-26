@@ -25,18 +25,18 @@ nodes_data={}
 #                                                 SECTION OVERRIDE], ...}
 elements_data={}
 
-# DICTIONARY: supports_data =[NODE, DEFINITION]
+# DICTIONARY: supports_data ={NODE: DEFINITION, ...}
 supports_data ={}
 
 # LOADCASES ARE STORED AS A NESTED DICTIONARY:
-# DICTIONARY STRUCTURE: loadcases={loadcase_number: 
+# DICTIONARY STRUCTURE: loadcases={loadcase_number:
 #                                                   {NODE1: [SUPX, SUPY],
 #                                                    NODE2: [SUPX, SUPY], ...},
-#                                  loadcase_number: { :[...]}}
+#                                  loadcase_number: { :[...], ...}, ...}
 loadcases={}
 
 # Read through imported file and extract data
-counter=0 
+counter=0
 for input_file_line in input_file_lines:
     for keyword in input_file_line.split(","):
 
@@ -51,7 +51,7 @@ for input_file_line in input_file_lines:
         if keyword == 'ELEMENTS':
             for count,element in enumerate(input_file_line.split(",")):
                 if count!=0:
-                    elements_data.setdefault(element.split()[0],[element.split()[1], element.split()[2], '', '', '', '', ''])
+                    elements_data.setdefault(element.split()[0],[int(element.split()[1]), int(element.split()[2]), '', '', '', '', ''])
 
 # Update elements_data dictionary based on material overrides
         if keyword == 'ELEMENT_MAT':
@@ -85,7 +85,7 @@ for input_file_line in input_file_lines:
             for i in support_nodes:
                 supports_data.setdefault(i, input_file_line.split(",")[2][1:-1])
             logging.debug(supports_data)
-            
+
         if keyword =='LOADCASE':
             loadcase_number = input_file_line.split()[1][:-1]
             for i in input_file_line.split(",")[2:]:
