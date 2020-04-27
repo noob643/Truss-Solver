@@ -54,7 +54,8 @@ for i in elements:
     st_mat[(i.endpos-1)*2+1][(i.startpos-1)*2+1]+=-i.k*i.sin**2
 
 st_mat_full=copy.deepcopy(st_mat)
-#Create load vectors (including self weigth based on member areas
+
+#Create load vectors (including self weigth based on member areas)
 #Create empty self weight matrix
 self_weight=[]
 for i in range(max(list(nodes_dict.keys()))*2):
@@ -100,6 +101,7 @@ for i in list(reversed(support_nodes)):
 node_displacements={}
 support_reactions={}
 element_forces={}
+# Every load combination will be solved now, results will be stored in dictionaries defined above
 for l in loadings:
 
 #Define supported nodes
@@ -122,12 +124,9 @@ for l in loadings:
         disp.insert((i),[0.0])
 
 #Record displacement against node instances
-
     for i in nodes:
         node_displacements.setdefault(l,{})
         node_displacements[l].setdefault(i,[disp[(i.name-1)*2][0],disp[(i.name-1)*2+1][0]])
-    #setattr(i,'dispx',disp[(i.name-1)*2][0])
-    #setattr(i,'dispy',disp[(i.name-1)*2+1][0])
 
 #Calculate support reactions
     disp=np.array(disp)
@@ -136,8 +135,6 @@ for l in loadings:
     for i in supports:
         support_reactions.setdefault(l,{})
         support_reactions[l].setdefault(i,[R[(i.point.name-1)*2][0],R[(i.point.name-1)*2+1][0]])
-    #setattr(i,'rx',R[(i.point.name-1)*2][0])
-    #setattr(i,'ry',R[(i.point.name-1)*2+1][0])
 
 #Calculate force in elements
     for i in elements:
@@ -146,7 +143,6 @@ for l in loadings:
         F=np.dot(np.array(lm),np.array(disp1))
         element_forces.setdefault(l,{})
         element_forces[l].setdefault(i, F[0])
-    #setattr(i,'force',F[0])
 
 # Assign displacements for node instances
 for j in nodes:
@@ -166,7 +162,8 @@ for j in elements:
     for i in element_forces:
         to_assign.setdefault(i,element_forces[i][j])
         setattr(j,'force',to_assign)
-        
+
+# Write output to file        
 results_file=open('results_file.txt','w')
 for i in nodes:
     results_file.write('Node '+str(i.name)+'\n')
