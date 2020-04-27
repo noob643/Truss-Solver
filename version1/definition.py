@@ -11,15 +11,22 @@ class Node:
         self.name=int(name)
         self.x=float(x)
         self.y=float(y)
-        self.dispx=''#will be modified after calculating results
-        self.dispy=''
+        self.disp=''#will be modified after calculating results
         Node.nodeCount+=1
 
-    def coordinates(self):
-        print('Node',self.name,'\nX:',self.x,'\nY:',self.y)
+    def p(self):
+        return('Node '+str(self.name)+' X: '+str(self.x)+' Y: '+str(self.y)+'\n')
 
     def xy(self):
         return [self.x, self.y]
+    
+    def r(self):
+        n=[]
+        for i in self.disp:
+            n.append('Loadcase     :'+str(i)+'\nX-disp       :'+str(round(self.disp[i][0]*1000,2))+'mm'+'\nY-disp       :'+str(round(self.disp[i][1]*1000,2))+'mm\n\n')
+        return n    
+        
+        
 
 #Definition of elements
 class Element:
@@ -70,18 +77,27 @@ class Element:
 
     #properties
     def p(self):
-        print('Element name     :',self.name)
-        print('Start Node       :',self.startpos,'with coordinates',self.point_start.xy())
-        print('End Node         :',self.endpos,'with coordinates',self.point_end.xy())
-        print('Material         :',self.material)
-        print('Strength         :',self.strength/10**6,'N/mm2')
-        print('Youngs Modulus   :',self.youngs/10**6,'N/mm2')
-        print('Density          :',self.density/1000,'kN/m3')
-        print('Section          :',self.section)
-        print('Area             :',self.area*10000,'cm2')
-        print('Length           :',round(self.length,2),'m')
-        print('Mass             :',round(self.weight/9.81,2),'kg')
-        print()
+        return(
+        '\n\nElement name     :'+str(self.name)+
+        '\nStart Node       :'+str(self.startpos)+' with coordinates '+str(self.point_start.xy())+
+        '\nEnd Node         :'+str(self.endpos)+' with coordinates '+str(self.point_end.xy())+
+        '\nMaterial         :'+str(self.material)+
+        '\nStrength         :'+str(self.strength/10**6)+'N/mm2'+
+        '\nYoungs Modulus   :'+str(self.youngs/10**6)+'N/mm2'+
+        '\nDensity          :'+str(self.density/1000)+'kN/m3'+
+        '\nSection          :'+str(self.section)+
+        '\nArea             :'+str(self.area*10000)+'cm2'+
+        '\nLength           :'+str(round(self.length,2))+'m'+
+        '\nMass             :'+str(round(self.weight/9.81,2))+'kg')
+        
+
+    #results
+    def r(self):
+        n=[]
+        for i in self.force:
+            n.append('\n\nLoadcase     :'+str(i)+
+            '\nAxial Force  :'+str(round(self.force[i]/1000,2))+'kN')
+        return n
 
 #Definition of supports
 class Support:
@@ -90,8 +106,7 @@ class Support:
     def __init__(self, point, sup_type):
         self.point=point
         self.sup_type=sup_type
-        self.rx=''
-        self.ry=''
+        self.res='' # will be modified after analysis is complete
         Support.supportCount+=1
 
     def sup_cols_rows(self):
@@ -101,6 +116,15 @@ class Support:
             return[(self.point.name-1)*2]
         else:
             return[(self.point.name-1)*2+1]
+    
+    def p(self):
+        return('\nNode '+str(self.point.name)+' Support Type: '+str(self.sup_type))
+    
+    def r(self):
+        n=[]
+        for i in self.res:
+            n.append('\nLoadcase     :'+str(i)+'\nX-reaction   :'+str(round(self.res[i][0]/1000,2))+' kN\nY-reaction   :'+str(round(self.res[i][1]/1000,2))+' kN\n')
+        return n
 
 #Definition of loads
 class Load:
@@ -111,4 +135,3 @@ class Load:
         self.x=loadx
         self.y=loady
         Load.loadCount+=1
-
